@@ -5,6 +5,7 @@ class GR8R_Credits_Admin {
 public function handleRequest() {
     $view = $_GET['view'] ?? 'dashboard';
 
+    // TODO: [Security] Check user permissions and/or nonce before rendering anything.
     switch ($view) {
         case 'balances':
             $this->render_credit_balances();
@@ -27,6 +28,11 @@ public function handleRequest() {
         }
 
         $action = $_POST['gr8r_action'];
+
+        // TODO: [Security] Check user permissions and/or nonce before processing the form.
+
+        require_once __DIR__ . '/class-gr8r-credits-manager.php';
+
         $manager = new GR8R_Credits_Manager();
 
         if ($action === 'add_credits') {
@@ -46,6 +52,7 @@ public function handleRequest() {
                 1 // Replace with actual admin ID if available
             );
 
+            // TODO: It's better to use wp_safe_redirect() - @see https://developer.wordpress.org/reference/functions/wp_safe_redirect/
             header("Location: ?page=balances&status=credits_added");
             exit;
         }
