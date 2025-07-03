@@ -74,25 +74,25 @@ if ( ! get_option('gr8r_credit_tables_created') ) {
 
 // Admin Menu
 add_action('admin_menu', function () {
-	require_once plugin_dir_path(__FILE__) . 'includes/class-admin.php';
+	require_once plugin_dir_path(__FILE__) . 'includes/class-gr8r-credits-admin.php';
 
-    add_menu_page(
+	add_menu_page(
 		'GR8R Credit Manager',
 		'GR8R Credits',
 		'manage_options',
 		'gr8r-credits',
 		function () {
-			$admin = new GR8R_Admin();
+			$admin = new GR8R_Credits_Admin();
 			$admin->handleFormSubmission();
 			$admin->handleRequest();
 		},
 		'dashicons-money-alt',
 		26
 	);
-});
-
+} );
 // Dokan Vendor Dashboard Tab
 add_filter('dokan_get_dashboard_nav', 'gr8r_add_vendor_report_tab');
+
 function gr8r_add_vendor_report_tab($urls) {
 	$urls['gr8r-credit-report'] = [
 		'title' => __('Credit Report', 'gr8r'),

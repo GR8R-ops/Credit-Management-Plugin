@@ -1,6 +1,6 @@
 <?php
 
-class GR8R_Admin {
+class GR8R_Credits_Admin {
 
 public function handleRequest() {
     $view = $_GET['view'] ?? 'dashboard';
