@@ -35,8 +35,11 @@ class GR8R_Credits_Admin {
 		$manager = new GR8R_Credits_Manager();
 
 		if ($action === 'add_credits') {
+			// TODO: Validate that $_POST['user_id'] is set, and is a valid user ID.
 			$user_id = (int)$_POST['user_id'];
+			// TODO: Validate that $_POST['amount'] is set, and is a valid float.
 			$amount = (float)$_POST['amount'];
+			// TODO: Validate that $_POST['description'] is set, and is not empty (assuming we require a description/note).
 			$description = strip_tags($_POST['description']);
 
 			$balance = $manager->get_balance($user_id);
@@ -48,6 +51,7 @@ class GR8R_Credits_Admin {
 				'credit',
 				'admin_adjustment',
 				$description,
+				// TODO: Use get_current_user_id()
 				1 // Replace with actual admin ID if available
 			);
 
