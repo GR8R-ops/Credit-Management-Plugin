@@ -9,8 +9,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require_once plugin_dir_path(__FILE__) . 'includes/class-admin.php';
-
 // Hook: Create Tables on Activation
 register_activation_hook(__FILE__, function () {
 	gr8r_create_credit_balance_table();
@@ -61,7 +59,9 @@ if (!get_option('gr8r_credit_tables_created')) {
 
 // Admin Menu
 add_action('admin_menu', function () {
-	add_menu_page(
+	require_once plugin_dir_path(__FILE__) . 'includes/class-admin.php';
+
+    add_menu_page(
 		'GR8R Credit Manager',
 		'GR8R Credits',
 		'manage_options',
