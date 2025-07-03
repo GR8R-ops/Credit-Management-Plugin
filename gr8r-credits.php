@@ -26,30 +26,6 @@ register_activation_hook( __FILE__, 'gr8r_credits_create_tables' );
 function gr8r_credits_create_credit_balance_table() {
 	global $wpdb;
 
-	/*
-		[Functional Comment]
-		As written, the table has the following columns:
-		 - id
-		 - user_id
-		 - vendor_id
-		 - service_type
-		 - balance
-		 - last_updated
-		What strikes me is that there is no relationship between this data and the product(s) the credits are for.
-		Without knowing the details, I can think of two ways that a credit might work:
-		 - A gym instructor offers x number of sessions as part of a package.
-		   * This should then be a reference to the WooCommerce product (or however we are representing the specific session)
-		   * We may need a second flag to indicate whether the credit is a monetary amount e.g. P200, or a number of sessions, e.g. 3 sessions
-		     - That suggests that `balance` might need to be an integer, not a float
-		 - A gym instructor offers a general credit towards one of a few products, e.g. P200
-		   * This may need to reference a group of product IDs or a product category ID
-		 - A gym instructor offers a choice of session types or lengths
-		   * This feels like a future need, and not something short term
-
-		QUESTIONS:
-		 - How are we representing the product(s) the credits are for?
-		 - What level of flexibility are we expecting?
-	*/
 	$table_name = $wpdb->prefix . 'gr8r_credit_balances';
 	$charset_collate = $wpdb->get_charset_collate();
 	$sql = "CREATE TABLE IF NOT EXISTS $table_name (
@@ -74,34 +50,6 @@ function gr8r_credits_create_credit_transaction_table() {
 	global $wpdb;
 	$table_name = $wpdb->prefix . 'gr8r_credit_transactions';
 	$charset_collate = $wpdb->get_charset_collate();
-	/*
-		[Functional Comment]
-		As written, the table has the following columns:
-		 - id
-		 - credit_id
-		 - user_id
-		 - vendor_id
-		 - amount
-		 - transaction_type
-		 - description
-		 - created_at
-		As I see it, this table is lacking some details. I am thinking about the following:
-		 - The user must have purchased a product or a subscription as a starting point. 
-		   * We definitely need a reference to the order and what was paid etc.
-		     - I am not sure how that works for subscription renewals, but we'd want each credits transaction to link back to the specific purchase that added it.
-		   * We almost certainly need a reference to the specific product within that order as well - the purchase may have included multiple products.
-		   * Do we need an amount to reflect the effective value of the credit? What happens if a user purchases 4 sessions, attends 2 and then the gym instructor leaves the program? Do we compute the refund manually?
-		 - As for the credits table, we need to indicate what the credit is for. Is this a monetary amount? Or a quantity of sessions? Or a group/set/category of items?
-
-		QUESTIONS:
-		 - How are we representing the product(s) the credits are for?
-		 - How will the gym instructor (or an admin) set up the gym subscriptions/bundles to represent the credits that they include?
-		   * At an implementation level, it feels like we should store this data as via product meta for the one-time product or subscription, and integrate with the WooCommerce product editor/UI to edit the fields
-		   * We can then use the same product meta to show accurate details to users
-		   * We may need separate fields for monetary amounts and session quantities
-		   * It will probably be best to have clear ways to identify what bundling options we need to support, and make that a drop-down control in the product editor UI
-		 - We need to keep in mind that we need to be able to list what outstanding credits a vendor has
-	 */
 	$sql = "CREATE TABLE IF NOT EXISTS $table_name (
 	id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 	credit_id BIGINT UNSIGNED NOT NULL,
