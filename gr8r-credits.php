@@ -115,6 +115,10 @@ function gr8r_load_vendor_report_page($query_vars) {
 
 // AJAX: Vendor Report
 add_action('wp_ajax_gr8r_vendor_report', 'gr8r_handle_vendor_report');
+
+/**
+ * Handle the vendor report AJAX request.
+ */
 function gr8r_handle_vendor_report() {
 	// TODO: [Security] Confirm the intended permissions for this check. As things stand, this check will allow the following users through:
 	//  - User has the dokandar and manage_woocommerce capabilities.
@@ -127,18 +131,30 @@ function gr8r_handle_vendor_report() {
 	$vendor_id = get_current_user_id();
 	global $wpdb;
 
-	$balances = $wpdb->get_results($wpdb->prepare("
-		SELECT user_id, service_type, balance, last_updated 
-		FROM {$wpdb->prefix}gr8r_credit_balances
-		WHERE vendor_id = %d
-	", $vendor_id), ARRAY_A);
+	$balances = $wpdb->get_results(
+		$wpdb->prepare(
+			"
+				SELECT user_id, service_type, balance, last_updated
+				FROM {$wpdb->prefix}gr8r_credit_balances
+				WHERE vendor_id = %d
+			",
+			$vendor_id
+		),
+		ARRAY_A
+	);
 
-	$debits = $wpdb->get_results($wpdb->prepare("
-		SELECT user_id, SUM(amount) AS total_debit
-		FROM {$wpdb->prefix}gr8r_credit_transactions
-		WHERE vendor_id = %d AND transaction_type = 'debit'
-		GROUP BY user_id
-	", $vendor_id), OBJECT_K);
+	$debits = $wpdb->get_results(
+		$wpdb->prepare(
+			"
+				SELECT user_id, SUM(amount) AS total_debit
+				FROM {$wpdb->prefix}gr8r_credit_transactions
+				WHERE vendor_id = %d AND transaction_type = 'debit'
+				GROUP BY user_id
+			",
+			$vendor_id
+		),
+		OBJECT_K
+	);
 
 	echo '<table class="widefat striped">';
 	echo '<thead><tr><th>User</th><th>Service</th><th>Balance</th><th>Used</th><th>Last Updated</th></tr></thead><tbody>';
@@ -182,11 +198,17 @@ add_shortcode('gr8r_credit_balance', function () {
 	global $wpdb;
 	$user_id = get_current_user_id();
 
-	$results = $wpdb->get_results($wpdb->prepare("
-		SELECT vendor_id, service_type, balance
-		FROM {$wpdb->prefix}gr8r_credit_balances
-		WHERE user_id = %d
-	", $user_id), ARRAY_A);
+	$results = $wpdb->get_results(
+		$wpdb->prepare(
+			"
+				SELECT vendor_id, service_type, balance
+				FROM {$wpdb->prefix}gr8r_credit_balances
+				WHERE user_id = %d
+			",
+			$user_id
+		),
+		ARRAY_A
+	);
 
 	if (empty($results)) {
 		return '<p>You currently have no credits available.</p>';
