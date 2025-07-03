@@ -5,6 +5,10 @@ Description: Admin interface for managing vendor credits.
 Version: 1.0
 */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 require_once plugin_dir_path(__FILE__) . 'includes/class-admin.php';
 
 // Hook: Create Tables on Activation
