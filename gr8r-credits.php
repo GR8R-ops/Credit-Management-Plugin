@@ -105,7 +105,9 @@ function gr8r_add_vendor_report_tab($urls) {
 
 // Render Vendor Report Page
 add_action('dokan_load_custom_template', 'gr8r_load_vendor_report_page');
+
 function gr8r_load_vendor_report_page($query_vars) {
+	// TODO: [Security] Confirm whether we need a nonce or other security check here.
 	if (isset($query_vars['gr8r-credit-report'])) {
 		include plugin_dir_path(__FILE__) . 'templates/vendor/credit-report.php';
 	}
@@ -114,7 +116,11 @@ function gr8r_load_vendor_report_page($query_vars) {
 // AJAX: Vendor Report
 add_action('wp_ajax_gr8r_vendor_report', 'gr8r_handle_vendor_report');
 function gr8r_handle_vendor_report() {
-	if (!current_user_can('dokandar') && !current_user_can('manage_woocommerce')) {
+	// TODO: [Security] Confirm the intended permissions for this check. As things stand, this check will allow the following users through:
+	//  - User has the dokandar and manage_woocommerce capabilities.
+	//  - User has the dokandar capability, but not the manage_woocommerce capability.
+	//  - User has the manage_woocommerce capability, but not the dokandar capability.
+	if ( ! current_user_can('dokandar') && ! current_user_can('manage_woocommerce') ) {
 		wp_die(__('Unauthorized access', 'gr8r'));
 	}
 
