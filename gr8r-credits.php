@@ -9,14 +9,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Hook: Create Tables on Activation
-register_activation_hook(__FILE__, function () {
-	gr8r_create_credit_balance_table();
-	gr8r_create_credit_transaction_table();
-});
+/**
+ * Create the tables for the plugin on activation.
+ */
+function gr8r_credits_create_tables() {
+	gr8r_credits_create_credit_balance_table();
+	gr8r_credits_create_credit_transaction_table();
+}
 
-function gr8r_create_credit_balance_table() {
+// Hook: Create Tables on Activation
+register_activation_hook( __FILE__, 'gr8r_credits_create_tables' );
+
+/**
+ * Create or update the credit balance table - [wp]_gr8r_credit_balances
+ */
+function gr8r_credits_create_credit_balance_table() {
 	global $wpdb;
+
 	$table_name = $wpdb->prefix . 'gr8r_credit_balances';
 	$charset_collate = $wpdb->get_charset_collate();
 	$sql = "CREATE TABLE IF NOT EXISTS $table_name (
@@ -27,33 +36,39 @@ function gr8r_create_credit_balance_table() {
 		balance FLOAT DEFAULT 0,
 		last_updated DATETIME DEFAULT CURRENT_TIMESTAMP,
 		UNIQUE KEY user_vendor_service (user_id, vendor_id, service_type)
-	) $charset_collate;";
+		) $charset_collate;";
+
 	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+
 	dbDelta($sql);
 }
 
-function gr8r_create_credit_transaction_table() {
+/**
+ * Create the credit transaction table - [wp]_gr8r_credit_transactions
+ */
+function gr8r_credits_create_credit_transaction_table() {
 	global $wpdb;
 	$table_name = $wpdb->prefix . 'gr8r_credit_transactions';
 	$charset_collate = $wpdb->get_charset_collate();
 	$sql = "CREATE TABLE IF NOT EXISTS $table_name (
-		id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-		credit_id BIGINT UNSIGNED NOT NULL,
-		user_id BIGINT UNSIGNED NOT NULL,
-		vendor_id BIGINT UNSIGNED NOT NULL,
-		amount FLOAT NOT NULL,
-		transaction_type VARCHAR(20) NOT NULL,
-		description TEXT,
-		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+	credit_id BIGINT UNSIGNED NOT NULL,
+	user_id BIGINT UNSIGNED NOT NULL,
+	vendor_id BIGINT UNSIGNED NOT NULL,
+	amount FLOAT NOT NULL,
+	transaction_type VARCHAR(20) NOT NULL,
+	description TEXT,
+	created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 	) $charset_collate;";
+
 	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 	dbDelta($sql);
 }
 
 // Optional table creation for dev/testing
-if (!get_option('gr8r_credit_tables_created')) {
-	gr8r_create_credit_balance_table();
-	gr8r_create_credit_transaction_table();
+// TODO: Move this into an action so it can be run in a known state; the `plugins_loaded` or `init` actions are likely the right ones.
+if ( ! get_option('gr8r_credit_tables_created') ) {
+	gr8r_credits_create_tables();
 	update_option('gr8r_credit_tables_created', 1);
 }
 
