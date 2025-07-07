@@ -28,8 +28,7 @@ register_deactivation_hook(__FILE__, 'gr8r_plugin_deactivation');
 add_action('plugins_loaded', function() {
     load_plugin_textdomain('gr8r', false, basename(GR8R_PATH) . '/languages/');
 });
-
-// Initialize components
+require_once GR8R_PATH . 'includes/class-shortcodes.php';
 new GR8R_Shortcodes();
 new GR8R_Admin();
 new GR8R_REST_API();
