@@ -12,6 +12,11 @@ WC requires at least: 5.0
 WC tested up to: 8.0
 */
 
+/*
+MAIN PLUGIN LOADER 
+~ INTIALIZES THE PLUGIN AND LOADS ALL CLASSES AND HOOKS
+*/
+
 defined('ABSPATH') || exit;
 
 // Define constants
@@ -28,8 +33,8 @@ require_once GR8R_ENHANCED_PATH . 'enhanced-includes/class-admin.php';
 require_once GR8R_ENHANCED_PATH . 'enhanced-includes/class-rest-api.php';
 require_once GR8R_ENHANCED_PATH . 'enhanced-includes/class-woocommerce-integration.php';
 require_once GR8R_ENHANCED_PATH . 'enhanced-includes/class-bookings-integration.php';
-require_once GR8R_ENHANCED_PATH . 'enhanced-includes/class-dokan-integration.php';
-require_once GR8R_ENHANCED_PATH . 'enhanced-includes/class-auto-apply-handler.php';
+require_once GR8R_ENHANCED_PATH . 'enhanced-includes/class-dokan-integration.php'; // REFERENCES FILE THAT DOES NOT EXIST
+require_once GR8R_ENHANCED_PATH . 'enhanced-includes/class-auto-apply-handler.php'; // REFERENCES FILE THAT DOES NOT EXIST
 
 // Activation/Deactivation hooks
 register_activation_hook(__FILE__, 'gr8r_enhanced_create_database_tables');
@@ -92,7 +97,7 @@ function gr8r_enhanced_create_database_tables() {
     
     $charset_collate = $wpdb->get_charset_collate();
     
-    // Credits Table
+    // Credits Table   
     $table_name = $wpdb->prefix . 'gr8r_enhanced_credits';
     $sql = "CREATE TABLE $table_name (
         credit_id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -106,7 +111,7 @@ function gr8r_enhanced_create_database_tables() {
         KEY vendor_service (vendor_id, service_type)
     ) $charset_collate;";
     
-    // Transactions Table
+    // Transactions Table //MISSING EXPIRY DATE AND LINKED TRANSCATION FIELDS
     $table_name = $wpdb->prefix . 'gr8r_enhanced_credit_transactions';
     $sql .= "CREATE TABLE $table_name (
         transaction_id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -251,7 +256,7 @@ function gr8r_enhanced_create_database_tables() {
         KEY is_used (is_used)
     ) $charset_collate;";
     
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php'); 
     dbDelta($sql);
     
     // Add version option
@@ -288,6 +293,7 @@ add_action('gr8r_enhanced_cleanup_expired_tokens', 'gr8r_enhanced_cleanup_expire
 /**
  * Cleanup expired coupons
  */
+
 function gr8r_enhanced_cleanup_expired_coupons() {
     global $wpdb;
     
@@ -305,7 +311,7 @@ function gr8r_enhanced_cleanup_expired_coupons() {
 function gr8r_enhanced_cleanup_old_logs() {
     global $wpdb;
     
-    $table_name = $wpdb->prefix . 'gr8r_enhanced_security_logs';
+    $table_name = $wpdb->prefix . 'gr8r_enhanced_security_logs'; // REFERENCES TABLE NAME THAT WASNT CREATED
     $wpdb->query($wpdb->prepare("
         DELETE FROM $table_name 
         WHERE timestamp < %s
@@ -365,7 +371,7 @@ function gr8r_enhanced_add_dashboard_nav($urls) {
 
 /**
  * Add query vars for Dokan
- */
+ */ 
 function gr8r_enhanced_add_query_vars($vars) {
     $vars[] = 'enhanced-coupons';
     $vars[] = 'enhanced-sessions';
@@ -395,7 +401,7 @@ function gr8r_enhanced_load_custom_templates($query_vars) {
 
 /**
  * Add dashboard content
- */
+ */  //FIXES - REFERENCES FILES THAT DON'T EXIT E.G. assets/css/dashboard.css, assets/js/dashboard.js SO THEY NEED TO BE CREATED
 function gr8r_enhanced_dashboard_content() {
     if (get_query_var('enhanced-coupons') || get_query_var('enhanced-sessions') || get_query_var('enhanced-credits')) {
         wp_enqueue_style('gr8r-enhanced-dashboard', GR8R_ENHANCED_URL . 'assets/css/dashboard.css', [], GR8R_ENHANCED_VERSION);
@@ -577,7 +583,7 @@ function gr8r_enhanced_save_product_meta($post_id) {
     );
 }
 
-// Flush rewrite rules on activation
+// Flush rewrite rules on activation/deactivation
 register_activation_hook(__FILE__, function() {
     gr8r_enhanced_add_account_endpoints();
     flush_rewrite_rules();
